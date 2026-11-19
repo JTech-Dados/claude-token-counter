@@ -1,0 +1,669 @@
+<style>
+  /* ============================ TOKENS ============================ */
+  :root{
+    --ground:#f5f6f8; --surface:#ffffff; --surface-2:#eef1f4;
+    --ink:#161a21; --muted:#586173; --faint:#8a93a4;
+    --border:#e2e6ec; --border-strong:#d2d8e0;
+    --accent:#0d7c8a; --accent-ink:#0a5e69; --accent-soft:#e2f1f2;
+    --amber:#b7671a; --amber-soft:#f6ead9;
+    --good:#2f7d4f; --warn:#b7671a; --crit:#c0433d;
+    --code-bg:#0f1620; --code-ink:#d7e0ea; --code-faint:#7f8da0;
+    --shadow:0 1px 2px rgba(20,25,35,.04), 0 8px 24px rgba(20,25,35,.06);
+    --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --maxw:74ch;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0d1117; --surface:#141a22; --surface-2:#1a2028;
+      --ink:#e6eaf0; --muted:#9aa4b2; --faint:#6b7688;
+      --border:#232b36; --border-strong:#2e3744;
+      --accent:#3fb9c6; --accent-ink:#5fcfd9; --accent-soft:#123138;
+      --amber:#e0954a; --amber-soft:#2c2114;
+      --good:#5fbf87; --warn:#e0954a; --crit:#e5605a;
+      --code-bg:#0a0f16; --code-ink:#cdd6e2; --code-faint:#5f6b7e;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f5f6f8; --surface:#ffffff; --surface-2:#eef1f4;
+    --ink:#161a21; --muted:#586173; --faint:#8a93a4;
+    --border:#e2e6ec; --border-strong:#d2d8e0;
+    --accent:#0d7c8a; --accent-ink:#0a5e69; --accent-soft:#e2f1f2;
+    --amber:#b7671a; --amber-soft:#f6ead9;
+    --good:#2f7d4f; --warn:#b7671a; --crit:#c0433d;
+    --code-bg:#0f1620; --code-ink:#d7e0ea; --code-faint:#7f8da0;
+    --shadow:0 1px 2px rgba(20,25,35,.04), 0 8px 24px rgba(20,25,35,.06);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1117; --surface:#141a22; --surface-2:#1a2028;
+    --ink:#e6eaf0; --muted:#9aa4b2; --faint:#6b7688;
+    --border:#232b36; --border-strong:#2e3744;
+    --accent:#3fb9c6; --accent-ink:#5fcfd9; --accent-soft:#123138;
+    --amber:#e0954a; --amber-soft:#2c2114;
+    --good:#5fbf87; --warn:#e0954a; --crit:#e5605a;
+    --code-bg:#0a0f16; --code-ink:#cdd6e2; --code-faint:#5f6b7e;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  /* ============================ BASE ============================ */
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-sans);
+    font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+    font-variant-ligatures:none}
+  a{color:var(--accent-ink);text-decoration:none}
+  a:hover{text-decoration:underline}
+  ::selection{background:var(--accent-soft);color:var(--ink)}
+
+  /* ============================ TOPBAR ============================ */
+  .topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--ground) 88%,transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:14px;padding:12px 20px}
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .brand .mark{width:30px;height:30px;flex:none;border-radius:8px;background:var(--code-bg);
+    display:grid;place-items:center;border:1px solid var(--border-strong)}
+  .brand .mark svg{width:17px;height:17px}
+  .brand .t{font-weight:680;font-size:14.5px;letter-spacing:-.01em;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  .brand .t small{display:block;font-family:var(--font-mono);font-size:11px;font-weight:500;
+    color:var(--faint);letter-spacing:.02em}
+  .spacer{flex:1}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);
+    font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:7px 11px;cursor:pointer}
+  .toggle:hover{border-color:var(--border-strong);color:var(--ink)}
+  .toggle svg{width:15px;height:15px}
+
+  /* ============================ LAYOUT ============================ */
+  .layout{max-width:1180px;margin:0 auto;padding:0 20px;
+    display:grid;grid-template-columns:264px minmax(0,1fr);gap:44px;align-items:start}
+  aside{position:sticky;top:60px;align-self:start;max-height:calc(100vh - 76px);
+    overflow-y:auto;padding:28px 0 40px}
+  .toc-h{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);padding:0 10px 10px}
+  nav.toc{display:flex;flex-direction:column;gap:1px}
+  nav.toc a{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:baseline;
+    padding:6px 10px;border-radius:7px;color:var(--muted);font-size:13.5px;line-height:1.35}
+  nav.toc a .n{font-family:var(--font-mono);font-size:11.5px;color:var(--faint);
+    font-variant-numeric:tabular-nums}
+  nav.toc a:hover{background:var(--surface-2);color:var(--ink);text-decoration:none}
+  nav.toc a.active{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+  nav.toc a.active .n{color:var(--accent)}
+
+  main{padding:28px 0 96px;min-width:0}
+
+  /* ============================ HERO ============================ */
+  .hero{padding:20px 0 30px;border-bottom:1px solid var(--border);margin-bottom:14px}
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent);display:inline-flex;align-items:center;gap:8px;margin-bottom:16px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent)}
+  h1{font-size:clamp(1.9rem,1.3rem+2.4vw,3rem);line-height:1.06;letter-spacing:-.025em;
+    margin:0 0 16px;text-wrap:balance;font-weight:720}
+  .lede{font-size:1.12rem;color:var(--muted);max-width:64ch;margin:0}
+  .lede b{color:var(--ink);font-weight:640}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);background:var(--surface);
+    border:1px solid var(--border);border-radius:20px;padding:4px 11px}
+
+  /* ============================ CONTENT ============================ */
+  section{padding-top:40px;scroll-margin-top:70px}
+  .sec-eyebrow{font-family:var(--font-mono);font-size:12px;color:var(--faint);letter-spacing:.04em;
+    margin-bottom:6px}
+  .sec-eyebrow b{color:var(--accent);font-weight:600}
+  h2{font-size:1.62rem;letter-spacing:-.02em;margin:.1em 0 .5em;font-weight:680;text-wrap:balance}
+  h3{font-size:1.12rem;letter-spacing:-.01em;margin:1.8em 0 .5em;font-weight:660}
+  p{max-width:var(--maxw)}
+  main :is(p,li){overflow-wrap:break-word}
+  ul,ol{max-width:var(--maxw);padding-left:1.25em}
+  li{margin:.3em 0}
+  li::marker{color:var(--faint)}
+  strong{font-weight:660}
+  hr{border:0;border-top:1px solid var(--border);margin:44px 0}
+  code{font-family:var(--font-mono);font-size:.86em;background:var(--surface-2);
+    border:1px solid var(--border);border-radius:5px;padding:.08em .38em}
+
+  /* code blocks */
+  pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--border-strong);
+    border-radius:11px;padding:16px 18px;overflow-x:auto;font-family:var(--font-mono);
+    font-size:12.8px;line-height:1.62;margin:16px 0;box-shadow:var(--shadow)}
+  pre code{background:none;border:0;padding:0;font-size:inherit;color:inherit}
+  pre .cm{color:var(--code-faint)}
+
+  /* tables */
+  .tbl{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:11px;
+    box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:13.6px;background:var(--surface)}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+  thead th{background:var(--surface-2);font-family:var(--font-mono);font-size:11.5px;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td code{white-space:nowrap}
+
+  /* callouts */
+  .callout{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;
+    background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:10px;padding:14px 16px;margin:18px 0;max-width:var(--maxw)}
+  .callout.amber{border-left-color:var(--amber)}
+  .callout .ic{width:20px;height:20px;color:var(--accent);flex:none;margin-top:2px}
+  .callout.amber .ic{color:var(--amber)}
+  .callout p{margin:0;max-width:none}
+  .callout .k{font-weight:680;letter-spacing:-.01em}
+
+  /* figure / diagram card */
+  figure{margin:18px 0}
+  figure pre{background:var(--surface);color:var(--muted);border-color:var(--border);
+    font-size:12px;line-height:1.5}
+  figcaption{font-family:var(--font-mono);font-size:11.5px;color:var(--faint);margin-top:8px;
+    text-align:center}
+
+  /* responsibility legend dots */
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+  .dot.host{background:var(--accent)} .dot.bridge{background:var(--amber)} .dot.rend{background:var(--muted)}
+
+  .foot{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--faint);
+    font-size:13px;max-width:var(--maxw)}
+
+  /* ============================ RESPONSIVE ============================ */
+  @media (max-width:940px){
+    .layout{grid-template-columns:1fr;gap:0}
+    aside{position:sticky;top:55px;z-index:30;max-height:none;overflow:visible;
+      background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--border);padding:10px 0;margin:0 -20px}
+    .toc-h{display:none}
+    nav.toc{flex-direction:row;overflow-x:auto;gap:6px;padding:2px 16px;scrollbar-width:none}
+    nav.toc::-webkit-scrollbar{display:none}
+    nav.toc a{grid-template-columns:auto;white-space:nowrap;padding:6px 11px;border:1px solid var(--border)}
+    nav.toc a .lbl{display:none}
+    nav.toc a .n::before{content:"§ "}
+    main{padding-top:22px}
+  }
+  @media (max-width:520px){
+    body{font-size:15px}
+    .brand .t small{display:none}
+  }
+</style>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#3fb9c6" stroke-width="2">
+        <rect x="2.5" y="4" width="19" height="16" rx="2"/><path d="M2.5 9h19"/><path d="M12 14l2.2 2.2L12 18.4"/></svg>
+    </span>
+    <span class="t">Apps Webview &amp; Híbridos<small>guia spec-driven</small></span>
+  </div>
+  <span class="spacer"></span>
+  <button class="toggle" id="themeToggle" aria-label="Alternar tema">
+    <svg id="themeGlyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+    <span id="themeLabel">tema</span>
+  </button>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="toc-h">Conteúdo</div>
+    <nav class="toc" id="toc">
+      <a href="#s1"><span class="n">01</span><span class="lbl">O modelo mental</span></a>
+      <a href="#s2"><span class="n">02</span><span class="lbl">Quando escolher</span></a>
+      <a href="#s3"><span class="n">03</span><span class="lbl">Arquitetura: host, renderer, ponte</span></a>
+      <a href="#s4"><span class="n">04</span><span class="lbl">Spec-Driven: o quê e porquê</span></a>
+      <a href="#s5"><span class="n">05</span><span class="lbl">Anatomia de uma spec</span></a>
+      <a href="#s6"><span class="n">06</span><span class="lbl">O contrato da ponte</span></a>
+      <a href="#s7"><span class="n">07</span><span class="lbl">Organização de pastas</span></a>
+      <a href="#s8"><span class="n">08</span><span class="lbl">Padrões de UI e estado</span></a>
+      <a href="#s9"><span class="n">09</span><span class="lbl">Segurança</span></a>
+      <a href="#s10"><span class="n">10</span><span class="lbl">Empacotamento</span></a>
+      <a href="#s11"><span class="n">11</span><span class="lbl">Testes</span></a>
+      <a href="#s12"><span class="n">12</span><span class="lbl">Fluxo passo a passo</span></a>
+      <a href="#s13"><span class="n">13</span><span class="lbl">Templates prontos</span></a>
+      <a href="#s14"><span class="n">14</span><span class="lbl">Anti-padrões</span></a>
+      <a href="#s15"><span class="n">15</span><span class="lbl">Ecossistema</span></a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <span class="eyebrow">Referência de engenharia</span>
+      <h1>Apps Webview &amp; Híbridos, do jeito spec-driven</h1>
+      <p class="lede">Como projetar, especificar e construir apps desktop cuja interface é
+        <b>HTML/CSS/JS renderizado num WebView embutido</b>, com um núcleo nativo cuidando de janela,
+        bandeja, SO e segredos. Vale para <b>pywebview, Tauri, Electron, Wails</b> e afins — o
+        framework é detalhe; o contrato e os estados são o que seguram o app.</p>
+      <div class="meta">
+        <span class="chip">host ↔ ponte ↔ renderer</span>
+        <span class="chip">contrato primeiro</span>
+        <span class="chip">UI = render(estado)</span>
+        <span class="chip">fronteira de confiança</span>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1">
+      <div class="sec-eyebrow"><b>§ 01</b> · fundamento</div>
+      <h2>O modelo mental</h2>
+      <p>Um app híbrido tem <strong>duas metades</strong> conversando por uma <strong>ponte</strong>.
+        O host é nativo e poderoso; o renderer é web e apresenta; a ponte é a fronteira por onde
+        tudo passa — e onde tudo é validado.</p>
+      <figure>
+<pre aria-hidden="false">┌──────────────────────────────────────────────────────────────┐
+│                      PROCESSO HOST (nativo)                    │
+│  Janela · Bandeja · Notificações · FS · Rede · Cripto · SO     │
+│  Regras de negócio · Segredos                                  │
+│                          ▲     │                               │
+│                   eventos│     │comandos                       │
+│                          │     ▼                               │
+│                    ┌───────────────┐                           │
+│                    │     PONTE      │  IPC / js_api / bridge    │
+│                    │  serialização  │  JSON · validação         │
+│                    └───────────────┘                           │
+│                          ▲     │                               │
+│                          │     ▼                               │
+│   ┌───────────────────────────────────────────────────────┐   │
+│   │                 RENDERER (WebView)                     │   │
+│   │  HTML/CSS/JS · apresentação · estado de UI             │   │
+│   │  SEM segredos · SEM confiança implícita               │   │
+│   └───────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────┘</pre>
+        <figcaption>host ↔ ponte ↔ renderer</figcaption>
+      </figure>
+      <div class="callout">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <p><span class="k">Princípio central.</span> O renderer é “burro e desconfiado”: só apresenta
+          e coleta interação. Toda lógica sensível, segredo e acesso ao SO vivem no <b>host</b>. Tudo
+          que cruza a ponte é <b>dado não-confiável</b>.</p>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <div class="sec-eyebrow"><b>§ 02</b> · decisão</div>
+      <h2>Quando escolher (e quando não)</h2>
+      <p><strong>Escolha webview/híbrido quando:</strong> a UI é rica/visual e você domina web;
+        quer um só código de UI (e talvez reaproveitar na web); quer iterar rápido no visual
+        (hot-reload, DevTools).</p>
+      <p><strong>Prefira UI nativa</strong> (Qt, WinUI, SwiftUI, Tkinter) quando latência/memória
+        são críticas, você precisa de aparência “pixel-nativa”, ou o app é só formulários simples.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Framework</th><th>Host</th><th>Motor web</th><th>Binário</th><th>Observação</th></tr></thead>
+        <tbody>
+          <tr><td>Electron</td><td>JS/Node</td><td>Chromium <b>embutido</b></td><td>~120–200&nbsp;MB</td><td>Consistente, pesado</td></tr>
+          <tr><td>Tauri</td><td>Rust</td><td>WebView <b>do SO</b></td><td>~3–10&nbsp;MB</td><td>Leve, seguro; curva de Rust</td></tr>
+          <tr><td>pywebview</td><td>Python</td><td>WebView <b>do SO</b></td><td>~5–30&nbsp;MB</td><td>Simples, ótimo pra Python</td></tr>
+          <tr><td>Wails</td><td>Go</td><td>WebView <b>do SO</b></td><td>~5–15&nbsp;MB</td><td>Leve, bindings Go↔JS</td></tr>
+          <tr><td>Neutralino</td><td>qualquer</td><td>WebView <b>do SO</b></td><td>~2&nbsp;MB</td><td>Minimalista</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>WebView do SO</strong> usa o navegador já instalado (WebView2 no Windows, WKWebView
+        no macOS, WebKitGTK no Linux): binário menor, mas depende do runtime existir/atualizar.
+        <strong>Chromium embutido</strong> renderiza igual em toda máquina, ao custo de tamanho.</p>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <div class="sec-eyebrow"><b>§ 03</b> · arquitetura</div>
+      <h2>Host, renderer e a ponte</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Camada</th><th>Faz</th><th>Não faz</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot host"></span><b>Host</b></td><td>janela, bandeja, SO, FS, rede, cripto, segredos, regra de negócio</td><td>renderizar UI, confiar no renderer</td></tr>
+          <tr><td><span class="dot bridge"></span><b>Ponte</b></td><td>expor comandos, emitir eventos, serializar, <b>validar entrada</b></td><td>lógica de negócio</td></tr>
+          <tr><td><span class="dot rend"></span><b>Renderer</b></td><td>apresentação, estado de UI, chamar comandos, tratar eventos</td><td>guardar segredo, acessar SO direto</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Dois sentidos de comunicação</h3>
+      <ul>
+        <li><strong>Comando</strong> (renderer → host): “faça X”, geralmente <code>async</code> e
+          retorna resultado — <code>getUsage()</code>, <code>saveSettings(x)</code>, <code>minimize()</code>.</li>
+        <li><strong>Evento</strong> (host → renderer): “algo mudou”, push assíncrono —
+          <code>onData(snapshot)</code>, <code>onError(e)</code>.</li>
+      </ul>
+      <h3>Modelo de concorrência</h3>
+      <ul>
+        <li>O <strong>renderer</strong> é single-thread; nunca bloqueie a UI.</li>
+        <li>O <strong>host</strong> faz trabalho pesado (rede/disco) fora da thread de UI e, ao
+          terminar, <b>empurra um evento</b> ou responde ao comando.</li>
+        <li>Padrão robusto: um <strong>poller</strong> mantém um <em>snapshot</em> atual; o renderer
+          lê o snapshot (rápido) e/ou recebe eventos quando ele muda.</li>
+      </ul>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <div class="sec-eyebrow"><b>§ 04</b> · método</div>
+      <h2>Spec-Driven: o quê e porquê</h2>
+      <p><strong>Spec-driven development</strong> é escrever a especificação verificável <em>antes</em>
+        do código: o que o sistema faz, quais estados existem, qual o contrato entre as partes e como
+        saber que está pronto. O código vira a <b>implementação de uma spec</b>, não o lugar onde as
+        decisões acontecem ad-hoc.</p>
+      <div class="callout amber">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+        <p><span class="k">Por que casa com apps híbridos.</span> A ponte <b>é um contrato</b> entre dois
+          mundos; a UI tem <b>muitos estados</b> fáceis de esquecer; segurança e empacotamento têm
+          requisitos que precisam ser <b>explícitos e checados</b>.</p>
+      </div>
+      <p><strong>Benefícios:</strong> menos retrabalho, testes derivados da spec, onboarding rápido, e um
+        contrato estável mesmo trocando o framework (Electron → Tauri) sem reescrever a UI.</p>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <div class="sec-eyebrow"><b>§ 05</b> · especificação</div>
+      <h2>Anatomia de uma spec completa</h2>
+      <p>Sete blocos, cada um curto e verificável.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>#</th><th>Bloco</th><th>Contém</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Produto</td><td>problema/usuário/valor · escopo (in/out) · métricas</td></tr>
+          <tr><td>2</td><td>Funcional</td><td>features com ID · fluxos · casos de borda · regras puras</td></tr>
+          <tr><td>3</td><td>UI</td><td>telas · <b>todos os estados</b> (loading/empty/error/ok/especiais) · tema · responsividade · a11y</td></tr>
+          <tr><td>4</td><td>Contrato</td><td>comandos, eventos, envelope de erro, versão (ver §06)</td></tr>
+          <tr><td>5</td><td>Não-funcional</td><td>segurança · performance · persistência · atualização</td></tr>
+          <tr><td>6</td><td>Empacotamento</td><td>SOs · runtime · instalador · assinatura</td></tr>
+          <tr><td>7</td><td>Definition of Done</td><td>checklist por feature + qualidade (testes, review, build)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 10h5"/></svg>
+        <p><span class="k">Estados são obrigatórios.</span> Liste, para cada tela,
+          <code>loading · empty · error · success</code> mais os estados especiais do domínio. Tela em
+          branco num estado não previsto é o bug mais comum desse modelo.</p>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <div class="sec-eyebrow"><b>§ 06</b> · o coração</div>
+      <h2>O contrato da ponte — projete primeiro</h2>
+      <p>Desenhe o contrato <strong>antes</strong> da UI e do host. Trate como uma <b>API</b>:
+        versione, valide, padronize erros.</p>
+      <h3>Envelope de resposta padronizado</h3>
+<pre><code><span class="cm">// sucesso</span>
+{ "ok": true,  "data": { <span class="cm">/* payload */</span> } }
+<span class="cm">// erro</span>
+{ "ok": false, "error": { "code": "TOKEN_MISSING", "message": "texto amigável" } }</code></pre>
+      <h3>Snapshot orientado a estado</h3>
+      <p>O renderer nunca “calcula” — ele <b>renderiza um snapshot</b> que o host entrega pronto:</p>
+<pre><code>{
+  "state": "ok",          <span class="cm">// "loading" | "empty" | "error" | "ok"</span>
+  "message": null,        <span class="cm">// preenchido em empty/error</span>
+  "items": [ <span class="cm">/* ... */</span> ],
+  "updatedAt": "2025-01-01T10:22:00Z",
+  "meta": { "version": 1 }
+}</code></pre>
+      <p>Assim a UI vira uma <strong>função pura do estado</strong>: <code>UI = render(snapshot)</code>.
+        Adicionar um estado novo = mudar o host + um branch no <code>render()</code>.</p>
+      <h3>Catálogo de comandos e eventos</h3>
+<pre><code>COMANDOS (renderer → host)          EVENTOS (host → renderer)
+  getSnapshot() -> Snapshot           onSnapshot(Snapshot)
+  refresh()     -> Snapshot           onError(Error)
+  saveSettings(Settings)              onSettingsChanged(Settings)
+  window.minimize() / hide()
+  window.resize(w, h)</code></pre>
+      <h3>Boas práticas de contrato</h3>
+      <ul>
+        <li><strong>Nomes estáveis e versionados</strong> (<code>meta.version</code>); mudança que quebra → suba a versão.</li>
+        <li><strong>Valide toda entrada</strong> no host (nunca confie em tipos vindos do JS).</li>
+        <li><strong>Erros como dados</strong> (envelope), não exceções atravessando a ponte.</li>
+        <li><strong>Idempotência</strong> onde fizer sentido.</li>
+        <li><strong>Sem segredo no snapshot</strong> — só o necessário para exibir.</li>
+      </ul>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <div class="sec-eyebrow"><b>§ 07</b> · estrutura</div>
+      <h2>Organização de pastas</h2>
+      <p>Muitos arquivos pequenos, organizados <strong>por feature/domínio</strong> (não por tipo),
+        com a <strong>lógica pura isolada</strong> para testar sem UI nem rede.</p>
+<pre><code>meu-app/
+├─ src/
+│  ├─ host/                  <span class="cm"># núcleo nativo (backend)</span>
+│  │  ├─ main.*              <span class="cm"># cria janela, bandeja, inicia loops</span>
+│  │  ├─ bridge/             <span class="cm"># a PONTE: comandos/eventos, validação</span>
+│  │  │  ├─ commands.*
+│  │  │  └─ contract.*       <span class="cm"># tipos/schema (fonte da verdade)</span>
+│  │  ├─ services/           <span class="cm"># rede, FS, cripto, integrações</span>
+│  │  ├─ domain/             <span class="cm"># lógica pura, testável</span>
+│  │  └─ platform/           <span class="cm"># tray, notificações, autostart</span>
+│  └─ web/                   <span class="cm"># renderer (frontend)</span>
+│     ├─ index.html
+│     ├─ styles/             <span class="cm"># tokens.css, themes.css</span>
+│     ├─ components/         <span class="cm"># por feature</span>
+│     ├─ lib/                <span class="cm"># bridge-client, render, helpers</span>
+│     └─ state/
+├─ assets/                   <span class="cm"># ícones, imagens, fontes</span>
+├─ tests/{unit,contract,e2e}/
+├─ packaging/                <span class="cm"># build, instalador, assinatura</span>
+├─ docs/{SPEC,CONTRACT,ARCHITECTURE}.md
+├─ .gitignore  ·  LICENSE  ·  README.md</code></pre>
+      <div class="tbl"><table>
+        <thead><tr><th>Framework</th><th>Onde fica o host</th><th>Onde fica a ponte</th></tr></thead>
+        <tbody>
+          <tr><td>pywebview</td><td><code>src/host/main.py</code></td><td><code>bridge/api.py</code> (classe <code>Api</code> = comandos)</td></tr>
+          <tr><td>Tauri</td><td><code>src-tauri/src/main.rs</code></td><td><code>#[tauri::command]</code> + allowlist</td></tr>
+          <tr><td>Electron</td><td><code>main/main.js</code></td><td><code>preload.js</code> + <code>contextBridge</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>Padrão comum: <b>um lugar para o host</b>, <b>um para a web</b>, <b>um para a ponte</b>,
+        <b>um para lógica pura</b>, <b>um para empacotamento</b>. Só mudam os nomes.</p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <div class="sec-eyebrow"><b>§ 08</b> · interface</div>
+      <h2>Padrões de UI e estado</h2>
+      <ul>
+        <li><strong>UI como função do estado:</strong> <code>render(snapshot)</code> decide tudo; sem estado escondido no DOM.</li>
+        <li><strong>Máquina de estados de tela:</strong> <code>loading → (ok | empty | error)</code>, cada um com layout próprio.</li>
+        <li><strong>Design tokens em CSS</strong> (<code>--color-*</code>, <code>--space-*</code>); trocar tema = trocar variáveis.</li>
+        <li><strong>Tema:</strong> claro/escuro/auto; persista a escolha; ofereça toggle.</li>
+        <li><strong>Responsividade:</strong> unidades relativas, flex/grid, <b>rolagem própria</b> em overflow; nada de tamanho fixo que corte conteúdo.</li>
+        <li><strong>Acessibilidade:</strong> HTML semântico, foco visível, contraste, <code>prefers-reduced-motion</code>.</li>
+        <li><strong>Feedback:</strong> comando que demora mostra estado e trata erro.</li>
+      </ul>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <div class="sec-eyebrow"><b>§ 09</b> · segurança</div>
+      <h2>A fronteira de confiança</h2>
+      <p>O renderer roda conteúdo web: trate-o como potencialmente hostil (XSS, dependência
+        comprometida).</p>
+      <ul>
+        <li><strong>CSP restritiva</strong> — sem <code>unsafe-inline</code> para script; idealmente tudo local/embutido.</li>
+        <li><strong>Isolamento de contexto</strong> — sem acesso direto a Node/SO no renderer (Electron: <code>contextIsolation:true</code>, <code>nodeIntegration:false</code>, <code>preload</code>+<code>contextBridge</code>; Tauri: allowlist mínima; pywebview: exponha só o necessário no <code>js_api</code>).</li>
+        <li><strong>Valide toda entrada</strong> vinda do renderer (tipos, faixas, tamanho).</li>
+        <li><strong>Segredos só no host</strong> — nunca no HTML/JS nem no snapshot; use o cofre do SO (DPAPI/Keychain/libsecret).</li>
+        <li><strong>Sem <code>eval</code>/<code>innerHTML</code></strong> com dado dinâmico não sanitizado.</li>
+        <li><strong>Superfície mínima</strong> de comandos; assine o binário; fixe versões; audite terceiros.</li>
+      </ul>
+      <div class="callout">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9.5 12l1.8 1.8 3.2-3.6"/></svg>
+        <p><span class="k">Mnemônico.</span> O renderer <b>nunca é dono de nada perigoso</b> — janela,
+          arquivo, segredo e rede são do host, acessados por comandos explícitos e validados.</p>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <div class="sec-eyebrow"><b>§ 10</b> · distribuição</div>
+      <h2>Empacotamento e distribuição</h2>
+      <ul>
+        <li><strong>Bundler por framework:</strong> PyInstaller/Briefcase, <code>tauri build</code>, electron-builder/Forge.</li>
+        <li><strong>Dependência de runtime:</strong> se usa WebView do SO, documente/instale o runtime (ex.: WebView2 no Windows) — ou embuta, se der.</li>
+        <li><strong>Assinatura de código:</strong> evita avisos do SO e <b>falsos-positivos de antivírus</b> (comuns em “onefile” não assinado). Sem verba de assinatura, prefira <b>onedir</b> a <b>onefile</b>.</li>
+        <li><strong>Instalador:</strong> MSI/NSIS/.pkg/AppImage; atalhos; opção de <b>iniciar com o sistema</b>.</li>
+        <li><strong>Auto-update:</strong> Tauri/Electron têm updaters; senão, cheque versão e baixe manual.</li>
+        <li><strong>Tamanho:</strong> WebView do SO ≪ Chromium embutido; faça tree-shaking do frontend.</li>
+        <li><strong>Distribuição:</strong> binários grandes vão em <b>Releases</b>, não no repositório git.</li>
+      </ul>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <div class="sec-eyebrow"><b>§ 11</b> · qualidade</div>
+      <h2>Estratégia de testes</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Nível</th><th>Alvo</th><th>Ferramenta (ex.)</th></tr></thead>
+        <tbody>
+          <tr><td>Unit</td><td><code>domain/</code> puro + helpers de UI</td><td>pytest · vitest · cargo test</td></tr>
+          <tr><td>Contract</td><td>snapshot e comandos batem com o schema</td><td>JSON Schema</td></tr>
+          <tr><td>Integração</td><td>serviços do host (rede/FS) com mocks</td><td>pytest · jest</td></tr>
+          <tr><td>E2E</td><td>dirige a UI real e verifica comportamento</td><td>Playwright · WebdriverIO · tauri-driver</td></tr>
+          <tr><td>Visual</td><td>regressão de screenshot (temas, breakpoints)</td><td>Playwright screenshots</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><strong>Isole a lógica pura</strong> (<code>domain/</code>) → 80% dos testes rápidos vivem aqui, sem UI.</li>
+        <li><strong>Testes de contrato</strong> pegam o erro mais caro: host e UI divergirem no formato.</li>
+        <li><strong>E2E</strong> cobre os estados (loading/empty/error/ok) e fluxos críticos.</li>
+      </ul>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <div class="sec-eyebrow"><b>§ 12</b> · processo</div>
+      <h2>Fluxo spec-driven, passo a passo</h2>
+<pre><code>1.  SPEC        docs/SPEC.md — escopo, features, estados
+2.  CONTRATO    docs/CONTRACT.md — comandos, eventos, envelope, snapshot
+3.  ESQUELETO   estrutura de pastas; stubs de comando retornando mock
+4.  UI-MOCK     render(snapshot) para TODOS os estados, com dados falsos
+5.  DOMÍNIO     lógica pura com TDD (RED → GREEN → REFACTOR)
+6.  SERVIÇOS    rede/FS/cripto no host; preenche o snapshot de verdade
+7.  PONTE       comandos/eventos reais; valida entradas; testes de contrato
+8.  NÃO-FUNC.   segurança, persistência, tema, responsividade, a11y
+9.  EMPACOTE    build + instalador + runtime + assinatura; teste em máquina limpa
+10. REVIEW      code review + Definition of Done; E2E dos fluxos-chave</code></pre>
+      <div class="callout">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+        <p><span class="k">Repare na ordem.</span> A <b>UI-mock (4)</b> vem <b>antes</b> do backend real:
+          como a UI é função do snapshot, você desenha e aprova o visual com dados falsos e só depois
+          “liga o cano”.</p>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <div class="sec-eyebrow"><b>§ 13</b> · reutilizável</div>
+      <h2>Templates prontos</h2>
+      <h3>SPEC.md (esqueleto)</h3>
+<pre><code># &lt;Nome do App&gt; — Especificação
+
+## 1. Produto     problema · usuário · valor · escopo · métricas
+## 2. Funcional   F-01 &lt;feature&gt;: descrição | fluxo | bordas | regras
+## 3. UI          telas · estados (loading|empty|error|ok|especiais) · tema · a11y
+## 4. Contrato    comandos · eventos  (detalhe em CONTRACT.md)
+## 5. Não-funcional  segurança · performance · persistência · atualização
+## 6. Empacotamento  SOs · runtime · instalador · assinatura
+## 7. Definition of Done
+   - [ ] Testes (unit/contract/e2e)   - [ ] Cobertura ≥ X%
+   - [ ] Estados de UI cobertos        - [ ] Review + build verde</code></pre>
+      <h3>CONTRACT.md (esqueleto)</h3>
+<pre><code># Contrato da Ponte — v1
+
+## Envelope
+  sucesso: { ok:true, data:&lt;T&gt; }
+  erro:    { ok:false, error:{ code, message } }
+
+## Snapshot
+  { state:"loading|empty|error|ok", message, items[], updatedAt, meta:{version} }
+
+## Comandos (renderer → host)
+  | nome         | args         | retorno  | erros              |
+  | getSnapshot  | —            | Snapshot | —                  |
+  | refresh      | —            | Snapshot | NETWORK, AUTH      |
+  | saveSettings | Settings     | Settings | VALIDATION         |
+  | window.resize| w:int, h:int | void     | —                  |
+
+## Eventos (host → renderer)
+  | onSnapshot | Snapshot | poller atualizou |
+  | onError    | Error    | falha assíncrona |</code></pre>
+      <h3>Definition of Done (checklist)</h3>
+<pre><code>[ ] Spec e contrato atualizados
+[ ] Todos os estados de UI implementados e testados
+[ ] Entradas validadas no host; erros no envelope padrão
+[ ] Sem segredo no renderer; CSP/isolamento aplicados
+[ ] Testes unit + contract + e2e verdes; cobertura ≥ meta
+[ ] Build empacotado testado em máquina limpa
+[ ] README + screenshots + licença</code></pre>
+    </section>
+
+    <!-- 14 -->
+    <section id="s14">
+      <div class="sec-eyebrow"><b>§ 14</b> · cuidado</div>
+      <h2>Anti-padrões e armadilhas</h2>
+      <ul>
+        <li><strong>Lógica de negócio no renderer.</strong> Migração de framework quebra tudo; segredo vaza.</li>
+        <li><strong>Confiar em dados do renderer</strong> sem validar no host.</li>
+        <li><strong>Snapshot que a UI precisa “recalcular”.</strong> Entregue pronto para exibir.</li>
+        <li><strong>Esquecer estados</strong> (só o “sucesso”): tela em branco em erro/vazio.</li>
+        <li><strong>Tamanho fixo sem rolagem</strong> → conteúdo cortado ao redimensionar.</li>
+        <li><strong>CSP permissiva / <code>innerHTML</code> com dado externo</strong> → XSS.</li>
+        <li><strong>Chamar comando a cada frame</strong> (ex.: em <code>resize</code>) sem throttle/<code>requestAnimationFrame</code>.</li>
+        <li><strong>Binário “onefile” não assinado</strong> e surpresa com antivírus/SmartScreen.</li>
+        <li><strong>Bloquear a thread de UI</strong> com rede/disco no renderer.</li>
+        <li><strong>Commitar build/segredos/estado local</strong> no git.</li>
+      </ul>
+    </section>
+
+    <!-- 15 -->
+    <section id="s15">
+      <div class="sec-eyebrow"><b>§ 15</b> · aprofundar</div>
+      <h2>Ecossistema e leituras</h2>
+      <ul>
+        <li><strong>Frameworks:</strong> Electron, Tauri, pywebview, Wails, Neutralino, NW.js, CEF.</li>
+        <li><strong>Motores web do SO:</strong> WebView2 (Win), WKWebView (macOS), WebKitGTK (Linux).</li>
+        <li><strong>Bridges/segurança:</strong> Electron <code>contextBridge</code>/<code>preload</code>; Tauri commands + allowlist; pywebview <code>js_api</code>.</li>
+        <li><strong>Empacotadores:</strong> electron-builder/Forge, <code>tauri build</code>, PyInstaller/Briefcase.</li>
+        <li><strong>Testes E2E:</strong> Playwright, WebdriverIO, <code>tauri-driver</code>.</li>
+        <li><strong>Conceitos:</strong> IPC e fronteira de confiança, JSON Schema/contract testing, máquinas de estado de UI, design tokens, code signing, auto-update.</li>
+      </ul>
+
+      <div class="callout amber">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <p><span class="k">Em uma frase.</span> Projete o <b>contrato</b> e os <b>estados</b> primeiro,
+          mantenha o <b>renderer burro e desconfiado</b>, isole a <b>lógica pura</b> para testar, e trate
+          a <b>ponte</b> como a API que segura o app inteiro — o framework vira detalhe.</p>
+      </div>
+
+      <p class="foot">Guia de referência genérico · host ↔ ponte ↔ renderer · spec-driven ·
+        aplicável a pywebview, Tauri, Electron, Wails e afins.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/>';
+  var MOON='<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+  var glyph=document.getElementById('themeGlyph');
+  var label=document.getElementById('themeLabel');
+  function isDark(){
+    var t=root.getAttribute('data-theme');
+    if(t) return t==='dark';
+    return window.matchMedia('(prefers-color-scheme:dark)').matches;
+  }
+  function paint(){ var d=isDark(); glyph.innerHTML=d?SUN:MOON; label.textContent=d?'claro':'escuro'; }
+  paint();
+  document.getElementById('themeToggle').addEventListener('click',function(){
+    root.setAttribute('data-theme', isDark()?'light':'dark'); paint();
+  });
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paint);
+
+  // scrollspy
+  var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+  var map={}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)]=a; });
+  var spy=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.remove('active');});
+        var a=map[e.target.id]; if(a){ a.classList.add('active');
+          a.scrollIntoView({block:'nearest',inline:'nearest'}); }
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px',threshold:0});
+  document.querySelectorAll('main section').forEach(function(s){spy.observe(s);});
+})();
+</script>
