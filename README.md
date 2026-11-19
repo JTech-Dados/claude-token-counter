@@ -11,7 +11,7 @@ Um widget de bandeja para Windows, leve e sempre à vista.
 ![Plataforma](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?style=for-the-badge&logo=windows&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-pywebview-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
-[**⬇ Baixar o instalador**](../../releases) · [Como entrar na conta](#-entrando-na-conta) · [Para desenvolvedores](#-para-desenvolvedores)
+**⏳ Instalador em breve** · [Como entrar na conta](#-entrando-na-conta) · [Para desenvolvedores](#-para-desenvolvedores)
 
 </div>
 
@@ -37,13 +37,19 @@ O **Contador de Tokens** fica na bandeja do sistema e mostra, em tempo real, o s
 | 🔔 | **Alerta configurável** | Bip + aviso no widget quando restar X % |
 | 🎨 | **Conforto** | Tema claro/escuro, instância única, posição lembrada e altura automática (sem barra de rolagem) |
 
-## 🚀 Instalação em 3 passos
+## 🚀 Instalação
 
-1. **Baixe** o instalador na página de [Releases](../../releases).
+> **⏳ Instalador em breve.** O primeiro release com o `.exe` ainda não foi publicado; assim que sair, ele ficará na página de [Releases](../../releases).
+
+Quando estiver disponível, a instalação será assim:
+
+1. **Baixe** o instalador na página de Releases.
 2. **Dê duplo-clique.** Ele instala o app, cria o atalho no Menu Iniciar, ativa o início com o Windows e instala o WebView2 se estiver faltando.
 3. Se o SmartScreen avisar (o instalador não é assinado): **Mais informações → Executar assim mesmo**.
 
-> O `.exe` não fica no repositório; é distribuído apenas pelos Releases.
+Quer testar agora? Dá para gerar o instalador a partir do código, seguindo [`installer/COMO-COMPILAR.md`](installer/COMO-COMPILAR.md).
+
+> O `.exe` não fica no repositório; será distribuído apenas pelos Releases.
 
 ## 🔑 Entrando na conta
 
